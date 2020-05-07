@@ -28,6 +28,9 @@ namespace NorthwindCrud
             });
 
             appHost.Plugins.Add(new RegistrationFeature()); //Enable /register Service
+            
+            // Allow posting messages back to Studio when loaded in an iframe
+            appHost.Plugins.Add(new CorsFeature(allowOriginWhitelist:new[]{ "https://localhost:5002" }));
         }
 
         public void AfterPluginsLoaded(IAppHost appHost)
