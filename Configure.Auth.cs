@@ -2,6 +2,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using ServiceStack;
 using ServiceStack.Auth;
+using ServiceStack.Configuration;
 using ServiceStack.Data;
 
 namespace NorthwindCrud
@@ -23,6 +24,7 @@ namespace NorthwindCrud
                 new IAuthProvider[] {
                     new CredentialsAuthProvider(appSettings),    // Username/Password credentials
                     new FacebookAuthProvider(appSettings),       /* Create App https://developers.facebook.com/apps */
+                    new JwtAuthProvider(appSettings) { AuthKey = AesUtils.CreateKey() },
                 }) {
                 IncludeOAuthTokensInAuthenticateResponse = true, // Include OAuth Keys in authenticated /auth page
             });

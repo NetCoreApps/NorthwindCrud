@@ -64,8 +64,8 @@ namespace NorthwindCrud
             var readOnlyTables = new[] { "Region" };
             var protectTableByRole = new Dictionary<string,string[]> {
                 ["Admin"]    = new[] { nameof(CrudEvent), nameof(ValidationRule) },
-                ["Accounts"] = new[] { "Order", "Supplier", "Shipper" },
                 ["Employee"] = new[] { "Customer", "Order", "OrderDetail" },
+                ["Accounts"] = new[] { "Supplier", "Shipper" },
                 ["Manager"]  = new[] { "Product", "Category", "Employee", "EmployeeTerritory", "UserAuth", "UserAuthDetails", "UserAuthRole" },
             };
             var tableRequiredFields = new Dictionary<string,string[]> {
@@ -73,7 +73,7 @@ namespace NorthwindCrud
             };
             
             Plugins.Add(new AutoQueryFeature {
-                MaxLimit = 100,
+                MaxLimit = 1000,
                 GenerateCrudServices = new GenerateCrudServices {
                     // Comment below to disable auto-generation of missing AutoQuery Services
                     AutoRegister = true,
