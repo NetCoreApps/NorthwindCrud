@@ -4,7 +4,7 @@ Northwind AutoQuery CRUD & ServiceStack Studio Demo.
 
 Download and Run with [x dotnet tool](https://docs.servicestack.net/dotnet-tool):
 
-    $ x download NetCoreApps/NorthwindCrud
+    $ x download NetCoreApps/NorthwindCrud -out NorthwindCrud
     $ cd NorthwindCrud
     $ dotnet run
 
