@@ -1,61 +1,22 @@
-using System.Linq;
-using Microsoft.Extensions.DependencyInjection;
 using ServiceStack;
 using ServiceStack.Auth;
-using ServiceStack.Configuration;
-using ServiceStack.Data;
+using NorthwindCrud.Data;
 
-namespace NorthwindCrud
+[assembly: HostingStartup(typeof(NorthwindCrud.ConfigureAuth))]
+
+namespace NorthwindCrud;
+
+public class ConfigureAuth : IHostingStartup
 {
-    public class ConfigureAuth : IConfigureServices, IConfigureAppHost, IPostInitPlugin
-    {
-        public void Configure(IServiceCollection services)
+    public void Configure(IWebHostBuilder builder) => builder
+        .ConfigureServices(services => {
+            services.AddSingleton<IAuthHttpGateway, AuthHttpGateway>();
+        })
+        .ConfigureAppHost(appHost => 
         {
-            // Persist Authenticated Users in Database 
-            services.AddSingleton<IAuthRepository>(c => 
-                new OrmLiteAuthRepository(c.Resolve<IDbConnectionFactory>()));
-        }
-
-        public void Configure(IAppHost appHost)
-        {
-            var appSettings = appHost.AppSettings;
-            // Setup Authentication
-            appHost.Plugins.Add(new AuthFeature(() => new AuthUserSession(), 
-                new IAuthProvider[] {
-                    new CredentialsAuthProvider(appSettings),    // Username/Password credentials
-                    new FacebookAuthProvider(appSettings),       /* Create App https://developers.facebook.com/apps */
-                    new JwtAuthProvider(appSettings) { AuthKey = AesUtils.CreateKey() },
-                }) {
-                IncludeOAuthTokensInAuthenticateResponse = true, // Include OAuth Keys in authenticated /auth page
-            });
-
-            appHost.Plugins.Add(new RegistrationFeature()); //Enable /register Service
-            
-            // Allow posting messages back to Studio when loaded in an iframe
-            appHost.Plugins.Add(new CorsFeature(allowOriginWhitelist:new[]{ "https://localhost:5002" }));
-        }
-
-        public void AfterPluginsLoaded(IAppHost appHost)
-        {
-            var authRepo = appHost.Resolve<IAuthRepository>();
-            authRepo.InitSchema();
-
-            // Register Users that don't exist
-            void EnsureUser(string email, string name, string[] roles=null)
-            {
-                if (authRepo.GetUserAuthByUserName(email) != null) 
-                    return;
-                
-                authRepo.CreateUserAuth(new UserAuth {
-                    Email = email,
-                    DisplayName = name,
-                    Roles = roles?.ToList(),
-                }, password:"p@ss");
-            }
-
-            EnsureUser("employee@gmail.com", name:"A Employee",   roles:new[]{ "Employee" });
-            EnsureUser("accounts@gmail.com", name:"Account Dept", roles:new[]{ "Employee", "Accounts" });
-            EnsureUser("manager@gmail.com",  name:"The Manager",  roles:new[]{ "Employee", "Manager" });
-        }
-    }
+            appHost.Plugins.Add(new AuthFeature(IdentityAuth.For<ApplicationUser>(options => {
+                options.EnableCredentialsAuth = true;
+                options.SessionFactory = () => new CustomUserSession();
+            })));
+        });
 }

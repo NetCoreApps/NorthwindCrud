@@ -1,183 +1,199 @@
 <html>
 <head>
-    <title>Northwind CRUD</title>
-    <style>
-        body { padding: 3em; }
-        body, input[type=text] { font: 32px/42px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif }
-        input { padding:.25em .5em; margin-right:.5em; }
-        #info { font-size: 20px; line-height: 26px; }
-        a { color: #007bff }
-        #result { display:inline-block;color:#28a745; }
-        th, td { padding-right: 1em; }
-        th { text-align: left; }
-        pre { border: 1px solid #ccc; padding: .25em .5em; width: 50%; min-width: 750px; color: #444; }
-        pre.sh { background: #f1f1f1; }
-        pre.comment { color: green; }
-        pre.sh::before { content: "$ " }
-        .muted { color: #999; }
-    </style>
+<title>My App</title>
+<style>
+    body { padding: 1em 1em 5em 1em; }
+    body, input[type=text] { font: 20px/28px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif }
+    input { padding:.25em .5em; margin-right:.5em; }
+    a { color:#007bff; text-decoration:none }
+    a:hover { text-decoration:underline }
+    #result { display:inline-block; color:#28a745; font-size:28px }
+    pre { border-radius:10px; overflow:hidden }
+    h2, h3, strong { font-weight:500 }
+</style>
+<link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/atom-one-dark.min.css">
+<script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script><!--safari polyfill-->
+<script type="importmap">
+{
+    "imports": {
+        "@servicestack/client": "https://unpkg.com/@servicestack/client@2/dist/servicestack-client.min.mjs"
+    }
+}
+</script>
 </head>
 <body>
 
-    <p>
-        <h3>Open in ServiceStack Studio</h3>
-        <div>
-            &nbsp; <a href="app://studio?connect=https://localhost:5001">app://studio?connect=https://localhost:5001</a>
-            <small class="muted">(Chromium Desktop App)</small>
-        </div>
-        <div>
-            <a href="xapp://studio?connect=https://localhost:5001">xapp://studio?connect=https://localhost:5001</a> 
-            <small class="muted">(x-platform Console App)</small>
-        </div>
-    </p>
+<div id="info" style="max-width:106ch"></div>
+<template id="info-template">
+## AutoCrud Links
 
-    <div id="info">
+| | |
+| --- | --- |
+| Metadata | [/metadata](/metadata) |
+| RDBMS Schema | [/crud/tables](/crud/tables) |
+| All Services (C#) | [/crud/all/csharp](/crud/all/csharp) |
+| Read Only Services (C#) | [/crud/all/csharp?IncludeCrudOperations=[Query]](/crud/all/csharp?IncludeCrudOperations=[Query]) |
+| Only Data Models (C#) | [/crud/all/csharp?IncludeCrudOperations=[]](/crud/all/csharp?IncludeCrudOperations=[]) |
+| New Auto Generated Services (C#) | [/crud/new/csharp](/crud/new/csharp) <small class="muted">(comment out AutoRegister)</small> |
+| Generate DTOs in alt languages (e.g. TypeScript) | [/crud/all/typescript](/crud/all/typescript) <small class="muted">(see [supported languages](https://docs.servicestack.net/add-servicestack-reference#language-paths))</small> |
 
-        <h3>Sign In with Existing Users</h3>
-        <table>
-            <tr>
-                <th>Email</th>
-                <th>Password</th>
-                <th>Roles</th>
-            </tr>
-            <tr>
-                <td>employee@gmail.com</td>
-                <td>p@ss</td>
-                <td>Employee</td>
-            </tr>
-            <tr>
-                <td>accounts@gmail.com</td>
-                <td>p@ss</td>
-                <td>Employee, Accounts</td>
-            </tr>
-            <tr>
-                <td>manager@gmail.com</td>
-                <td>p@ss</td>
-                <td>Employee, Manager</td>
-            </tr>
-            <tr>
-                <td>Super User</td>
-                <td>zsecret (using AuthSecret)</td>
-                <td>Admin</td>
-            </tr>
-        </table>
+### Auto Generate APIs and Data Models
 
-        <h3>AutoCrud Links</h3>
-        <table>
-            <tr>
-                <th>Metadata</th>
-                <td>
-                    <a href="/metadata">/metadata</a>
-                </td>
-            </tr>
-            <tr>
-                <th>RDBMS Schema</th>
-                <td>
-                    <a href="/crud/tables">/crud/tables</a>
-                </td>
-            </tr>
-            <tr>
-                <th>All Services (C#)</th>
-                <td>
-                    <a href="/crud/all/csharp">/crud/all/csharp</a>
-                </td>
-            </tr>
-            <tr>
-                <th>New Auto Generated Services (C#)</th>
-                <td>
-                    <a href="/crud/new/csharp">/crud/new/csharp</a> <small class="muted">(comment out AutoRegister)</small>
-                </td>
-            </tr>
-            <tr>
-                <th>Generate DTOs in alt languages (e.g. TypeScript)</th>
-                <td>
-                    <a href="/crud/all/typescript">/crud/all/typescript</a>
-                    (see <a href="https://docs.servicestack.net/add-servicestack-reference#language-paths">supported languages</a>)
-                </td>
-            </tr>
-            <tfoot>
-            <tr>
-                <td colspan="2" class="muted" style="padding:.5em 0 0 0">
-                    * requires <a href="https://docs.servicestack.net/debugging#debugmode">DebugMode</a> or Admin role
-                    (e.g. <a href="https://docs.servicestack.net/debugging#authsecret">?authsecret=zsecret</a>)
-                </td>
-            </tr>
-            </tfoot>
-        </table>
+```sh
+x csharp https://localhost:5001 -path /crud/all/csharp
+```
 
-        <h3>Eject into code-first models</h3>
-        <p>
-            When ready, take over and customize generated Types into code-first Models
-        </p>
-        
-        <p>
-            1. Comment out auto-registration of generated AutoQuery Services:
-        </p>
-        
-        <pre class="cs comment">// AutoRegister=true</pre>
+Generate With options, e.g. only generate Data Models:
 
-        <p>
-            2. Use dotnet tool to generate Types for Tables with Services & Types that don't exist:
-        </p>
-        
-        <pre class="sh">x csharp https://localhost:5001 -path /crud/new/csharp</pre>
-        
-        <div>
-            If RDBMS Schema changes, can update dtos as normal:
-        </div>
-        <pre class="sh">x csharp</pre>
+```sh
+x csharp https://localhost:5001 -path /crud/all/csharp -q IncludeCrudOperations=[]
+```
 
-    </div>
+Only read-only APIs by only generating Query AutoQuery Request DTOs:
 
-    <h2 style="margin-top:2em; border-top: 1px solid #eee; padding-top:.5em">
-        <a href="/json/metadata?op=Hello">Hello</a> API
-    </h2>
-    <input type="text" id="txtName" placeholder="Name" onkeyup="callHello(this.value)">
-    <div id="result"></div>
-    
-    <h3>Example Code</h3>
-    <div style="font-size:20px;line-height:26px">
-        <pre>&lt;script src="/js/servicestack-client.js"&gt;&lt;/script&gt;</pre>
-        <pre class="csharp">Object.assign(window, window['@servicestack/client']) //import
+```sh
+x csharp https://localhost:5001 -path /crud/all/csharp -q IncludeCrudOperations=[Query]
+```
 
-var client = new JsonServiceClient()
-client.get(new Hello({ name: name }))
-    .then(function(r) {
-        console.log(r.result)
-    })
-</pre>
-        
-        <p>
-            Generate Typed DTOs from 
-            <a href="https://docs.servicestack.net/typescript-add-servicestack-reference">Add ServiceStack Reference</a> 
-        </p>
-    </div>
+Only generate Create and Update APIs (i.e. no Delete):
 
-<script src="/js/servicestack-client.js"></script>
-<script>
-    Object.assign(window, window['@servicestack/client']); //import into global namespace
+```sh
+x csharp https://localhost:5001 -path /crud/all/csharp -q IncludeCrudOperations=[Query,Create,Patch]
+```
 
-    // generate typed dtos with https://docs.servicestack.net/typescript-add-servicestack-reference
-    var Hello = /** @class */ (function () {
-        function Hello(init) { Object.assign(this, init); }
-        Hello.prototype.createResponse = function () { return new HelloResponse(); };
-        Hello.prototype.getTypeName = function () { return 'Hello'; };
-        return Hello;
-    }());
-    var HelloResponse = /** @class */ (function () {
-        function HelloResponse(init) { Object.assign(this, init); }
-        return HelloResponse;
-    }());
+### Eject into code-first models
 
-    var client = new JsonServiceClient();
-    function callHello(val) {
-        client.get(new Hello({ name: val }))
-            .then(function(r) {
-                document.getElementById('result').innerHTML = r.result;
-            });
+When ready, take over and customize generated Types into code-first Models:
+
+1. Comment out auto-registration of generated AutoQuery Services:
+
+```csharp
+// AutoRegister=true
+```
+
+2. Use dotnet tool to generate Types for Tables with Services & Types that don't exist:
+
+```sh
+x csharp https://localhost:5001 -path /crud/new/csharp
+```
+
+3. If RDBMS Schema changes, can update dtos as normal:
+
+```sh
+x csharp
+```
+</template>
+
+
+<h2 style="margin-top:3em"><a href="/ui/Hello">Hello</a> API</h2>
+<input type="text" id="txtName">
+<div id="result"></div>
+
+<script type="module">
+import { JsonApiClient, $1, on } from '@servicestack/client'
+import { Hello } from '/types/mjs'
+
+const client = JsonApiClient.create()
+on('#txtName', {
+    /** @param {Event} el */
+    async keyup(el) {
+        const api = await client.api(new Hello({ name:el.target.value }))
+        $1('#result').innerHTML = api.response.result
     }
+})
+
+$1('#txtName').value = 'World'
+$1('#txtName').dispatchEvent(new KeyboardEvent('keyup'))
 </script>
 
+<div id="content" style="max-width:106ch"></div>
+
+<template id="content-template">
+## View in API Explorer
+
+- [Call API](/ui/Hello)
+- [View API Details](/ui/Hello?tab=details)
+- [Browse API source code in different langauges](/ui/Hello?tab=code)
+
+### Using JsonServiceClient in Web Pages
+
+Easiest way to call APIs is to use [@servicestack/client](https://docs.servicestack.net/javascript-client) with
+the built-in [/types/mjs](/types/mjs) which returns your APIs in annotated typed ES6 class DTOs where it can be 
+referenced directly from a [JavaScript Module](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules).
+
+We recommend using an [importmap](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap) 
+to specify where to load **@servicestack/client** from, e.g:
+
+```html
+&lt;script type="importmap"&gt;
+{
+  "imports": {
+    "@servicestack/client":"https://unpkg.com/@servicestack/client@2/dist/servicestack-client.mjs"
+  }
+}
+&lt;/script&gt;
+```
+
+This lets us reference the **@servicestack/client** package name in our source code instead of its physical location:
+    
+```html
+&lt;input type="text" id="txtName"&gt;
+&lt;div id="result"&gt;&lt;/div&gt;
+```
+
+```html
+&lt;script type="module"&gt;
+import { JsonApiClient, $1, on } from '@servicestack/client'
+import { Hello } from '/types/mjs'
+
+const client = JsonApiClient.create()
+on('#txtName', {
+    async keyup(el) {
+        const api = await client.api(new Hello({ name:el.target.value }))
+        $1('#result').innerHTML = api.response.result
+    }
+})
+&lt;/script&gt;
+```
+
+### Enable static analysis and intelli-sense 
+
+For better IDE intelli-sense during development, save the annotated Typed DTOs to disk with the [x dotnet tool](https://docs.servicestack.net/dotnet-tool):
+
+```bash
+$ x mjs
+```
+
+Then reference it instead to enable IDE static analysis when calling Typed APIs from JavaScript:
+
+```js
+import { Hello } from '/js/dtos.mjs'
+client.api(new Hello({ name }))
+```
+    
+To also enable static analysis for **@servicestack/client**, install the dependency-free library as a dev dependency:
+    
+```bash
+$ npm install -D @servicestack/client
+```
+
+Where only its TypeScript definitions are used by the IDE during development to enable its type-checking and intelli-sense.
+</template>
+
+<script src="https://unpkg.com/@highlightjs/cdn-assets@11.7.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+function decode(html) {
+    const txt = document.createElement("textarea")
+    txt.innerHTML = html
+    return txt.value
+}
+document.querySelector('#info').innerHTML = marked.parse(decode(document.querySelector('#info-template').innerHTML))
+document.querySelector('#content').innerHTML = marked.parse(decode(document.querySelector('#content-template').innerHTML))
+hljs.highlightAll()
+</script>
+
+</div>
 
 </body>
 </html>
